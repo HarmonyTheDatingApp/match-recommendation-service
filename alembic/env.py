@@ -32,7 +32,7 @@ target_metadata = Base.metadata
 
 
 def get_url():
-  return os.getenv("HARMONY_MRS_DB")
+  return os.getenv("DATABASE_URL")
 
 
 def run_migrations_offline():
