@@ -8,8 +8,10 @@ greenlet==1.0.0
 h11==0.12.0
 idna==2.10
 importlib-metadata==4.0.1
+joblib==1.0.1
 Mako==1.1.4
 MarkupSafe==1.1.1
+numpy==1.20.2
 psycopg2==2.8.6
 pydantic==1.8.1
 python-dateutil==2.8.1
@@ -17,9 +19,12 @@ python-dotenv==0.17.0
 python-editor==1.0.4
 PyYAML==5.4.1
 requests==2.25.1
+scikit-learn==0.24.2
+scipy==1.6.3
 six==1.15.0
 SQLAlchemy==1.4.11
 starlette==0.13.6
+threadpoolctl==2.1.0
 typing-extensions==3.7.4.3
 urllib3==1.26.4
 uvicorn==0.13.4
