@@ -8,9 +8,9 @@ from core.Spotify import Spotify
 class FeatureExtractor:
   RANDOM_STATE = 42
   
-  def __init__(self, track_ids: List[str]):
+  def __init__(self, client: Spotify, track_ids: List[str]):
     self.track_ids = track_ids
-    self.client = Spotify()
+    self.client = client
     self.features = None
   
   def extract_raw_features(self, normalize: bool = False):
@@ -51,4 +51,4 @@ class FeatureExtractor:
     vectors = [[track[feature] for feature in features_list] for track in self.features]
     kmeans.fit(vectors)
     
-    return kmeans.cluster_centers_.to_list()
+    return kmeans.cluster_centers_.tolist()
