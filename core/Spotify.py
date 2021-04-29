@@ -56,7 +56,7 @@ class Spotify:
     Spotify.logger.error(f"HTTP{res.status_code}: {method}, {url}: {detail}")
     raise Spotify.HTTPException(status_code=res.status_code, detail=detail)
   
-  def get_audio_features(self, track_ids: List[str], normalize: bool = False) -> List[Dict]:
+  def get_audio_features(self, track_ids: List[str]) -> List[Dict]:
     res = self.make_api_call('get', url=f"{Spotify.BASE_URL}/v1/audio-features",
                              headers={
                                'Authorization': f'Bearer {self.access_token}',
@@ -74,19 +74,6 @@ class Spotify:
       track_features = {}
       for feature in Spotify.AUDIO_FEATURES:
         track_features[feature] = item[feature]
-      
-      if normalize:
-        """
-        Normalizes loudness (assumed range: 0 to -60) and tempo (assumed range: 50 to 200).
-        Hard-max/Hard-min if values out of range.
-        """
-        x = track_features['loudness']
-        x = max(min(x, 0), -60) / (-60)
-        track_features['loudness'] = round(x, 4)
-        
-        x = track_features['tempo']
-        x = (max(min(x, 200), 50) - 50) / (200 - 50)
-        track_features['tempo'] = round(x, 4)
       
       data.append(track_features)
     
