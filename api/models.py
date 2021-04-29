@@ -16,6 +16,7 @@ class User(Base):
   registered_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
   
   tracks = relationship("Track", back_populates="users", cascade="all, delete")
+  tastes = relationship("MusicTaste", back_populates="users", cascade="all, delete")
 
 
 class Track(Base):
@@ -26,3 +27,14 @@ class Track(Base):
   track = sa.Column(sa.String(length=40), nullable=False)
   
   users = relationship("User", back_populates="tracks")
+
+
+class MusicTaste(Base):
+  __tablename__ = 'musictaste'
+  
+  id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+  user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"))
+  vector = sa.Column(sa.ARRAY(sa.Float), nullable=False)
+  created_on = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
+
+  users = relationship("User", back_populates="tastes")
