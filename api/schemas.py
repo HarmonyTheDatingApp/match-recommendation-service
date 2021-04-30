@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel
 import datetime
+from typing import List
 
 class Gender(str, Enum):
   male = "male"
@@ -22,8 +23,19 @@ class User(BaseModel):
     orm_mode = True
 
 
+class UserCreate(User):
+  tracks: List[str]
+
+
 class Track(BaseModel):
   track: str
+  
+  class Config:
+    orm_mode = True
+
+
+class MusicTaste(BaseModel):
+  taste: List[List[float]]
   
   class Config:
     orm_mode = True

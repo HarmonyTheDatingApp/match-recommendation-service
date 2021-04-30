@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
+from core.Spotify import Spotify
+
+client = Spotify()
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -22,10 +25,10 @@ def home():
   return {"msg": "Hello world!"}
 
 @app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.User, db: Session = Depends(get_db_session)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db_session)):
   if crud.get_user(db, user_id=user.id):
     raise HTTPException(status_code=400, detail="User already registered.")
-  return crud.register_user(db, user=user)
+  return crud.register_user(db, user=user, spotify_client=client)
 
 @app.get("/users/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db_session)):
@@ -42,3 +45,7 @@ def add_track(track: schemas.Track, user_id: int, db: Session = Depends(get_db_s
 def get_tracks(user_id: int, db: Session = Depends(get_db_session)):
   tracks = crud.get_tracks_for_user(db, user_id=user_id)
   return tracks
+
+@app.get("/users/{user_id}/taste/", response_model=schemas.MusicTaste)
+def get_music_taste(user_id: int, db: Session = Depends(get_db_session)):
+  return crud.get_music_taste(db, user_id)
