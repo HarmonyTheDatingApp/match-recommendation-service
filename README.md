@@ -2,7 +2,7 @@
 Match Recommendation Service for the Harmony app.
 
 ## Local Setup
-Requires Python-3.5+.
+Requires Python-3.6+.
 * Clone the forked repository.
 * Create a virtual environment: `python -m venv venv`.
 * Upgrade PIP: `python -m pip install –upgrade pip`
