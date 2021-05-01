@@ -15,6 +15,11 @@ def get_tracks_for_user(db: Session, user_id: int):
 def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> schemas.User:
   new_user = models.User(id=user.id, gender=user.gender, dob=user.dob, pref_interested_in=user.pref_interested_in)
   db.add(new_user)
+  db.commit()
+  db.refresh(new_user)
+  
+  tracks = [models.Track(user_id=user.id, track=track) for track in user.tracks]
+  db.bulk_save_objects(tracks)
   
   # Enchancement: Can run this extra task on separate worker.
   feature_extractor = FeatureExtractor(track_ids=user.tracks, client=spotify_client)
@@ -24,7 +29,6 @@ def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify
     db.add(taste)
 
   db.commit()
-  db.refresh(new_user)
   return new_user
 
 def add_track(db: Session, track: schemas.Track, user_id: int):
