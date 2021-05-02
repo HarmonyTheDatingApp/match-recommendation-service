@@ -39,3 +39,10 @@ class MusicTaste(BaseModel):
   
   class Config:
     orm_mode = True
+
+
+class RecommendedUsers(BaseModel):
+  recommendation: List[int]
+
+  class Config:
+    orm_mode = True
