@@ -13,6 +13,8 @@ class User(Base):
   dob = sa.Column(sa.Date(), nullable=False)
   pref_interested_in = sa.Column(sa.Enum(InterestedIn, name="pref_interested_in_enum",
                                          create_type=False), nullable=False)
+  pref_age_min = sa.Column(sa.Integer, nullable=False, default=18)
+  pref_age_max = sa.Column(sa.Integer, nullable=False, default=60)
   registered_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
   
   tracks = relationship("Track", back_populates="users", cascade="all, delete")

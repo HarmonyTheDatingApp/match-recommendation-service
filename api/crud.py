@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, extract
 import numpy as np
 from typing import List
 from datetime import datetime
 
-from . import models, schemas
+from api import models, schemas
 from core.FeatureExtractor import FeatureExtractor
 from core.Spotify import Spotify
 
@@ -36,6 +36,15 @@ def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify
   
   db.commit()
   return new_user
+
+
+def post_preferences(db: Session, this_user: models.User, preferences: schemas.Preferences):
+  this_user.pref_interested_in = preferences.pref_interested_in
+  this_user.pref_age_min = preferences.pref_age_min
+  this_user.pref_age_max = preferences.pref_age_max
+  db.commit()
+  db.refresh(this_user)
+  return this_user
 
 
 def add_track(db: Session, track: schemas.Track, user_id: int):
@@ -70,6 +79,10 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
   preferred_gender = None if this_user.pref_interested_in == 'everyone' else this_user.pref_interested_in
   if preferred_gender:
     recommended_users = recommended_users.filter(models.User.gender == preferred_gender)
+  pref_age_min, pref_age_max = this_user.pref_age_min, this_user.pref_age_max
+  recommended_users = recommended_users.filter(
+    extract('year', func.age(models.User.dob)).between(pref_age_min, pref_age_max)
+  )
   
   recommended_users = recommended_users.group_by(models.MusicTaste.user_id)\
                                        .order_by(func.avg(func.cube(models.MusicTaste.vector)

@@ -30,6 +30,13 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db_session))
     raise HTTPException(status_code=400, detail="User already registered.")
   return crud.register_user(db, user=user, spotify_client=client)
 
+@app.post("/users/{user_id}/preferences", response_model=schemas.User)
+def update_preferences(user_id: int, preferences: schemas.Preferences, db: Session = Depends(get_db_session)):
+  user = crud.get_user(db, user_id)
+  if user is None:
+    return HTTPException(status_code=400, detail="User not found.")
+  return crud.post_preferences(db, user, preferences)
+
 @app.get("/users/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db_session)):
   user = crud.get_user(db, user_id=user_id)
