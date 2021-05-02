@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import numpy as np
+from typing import List
 from datetime import datetime
 
 from . import models, schemas
@@ -60,7 +61,7 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
   right_swipes = db.query(models.RightSwipe).filter(models.RightSwipe.swiper == this_user.id).subquery()
   
   recommended_users = db.query(models.MusicTaste.user_id)\
-                        .join(right_swipes, right_swipes.c.swipee == models.MusicTaste.user_id)\
+                        .outerjoin(right_swipes, right_swipes.c.swipee == models.MusicTaste.user_id)\
                         .join(models.User, models.MusicTaste.user_id == models.User.id)\
                         .filter(right_swipes.c.swipee == None)\
                         .filter(models.User.id != this_user.id)
