@@ -56,3 +56,11 @@ def get_recommendation(user_id: int, limit: Optional[int] = 10, db: Session = De
   if user is None:
     raise HTTPException(status_code=400, detail="User not found.")
   return crud.get_user_recommendation(db, user, limit)
+
+@app.post("/users/{user_id}/update-right-swipes/", response_model=schemas.RightSwipeStats)
+def post_right_swiped_users(user_id: int, right_swiped_users: schemas.RightSwipedUsers,
+                            db: Session = Depends(get_db_session)):
+  user = crud.get_user(user_id=user_id, db=db)
+  if user is None:
+    raise HTTPException(status_code=400, detail="User not found.")
+  return crud.post_right_swipes(db, user, right_swiped_users)

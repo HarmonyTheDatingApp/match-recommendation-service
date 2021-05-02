@@ -46,3 +46,18 @@ class RecommendedUsers(BaseModel):
 
   class Config:
     orm_mode = True
+
+
+class RightSwipedUsers(BaseModel):
+  swipees: List[int]
+  
+  class Config:
+    orm_mode = True
+
+
+class RightSwipeStats(BaseModel):
+  right_swipes: int
+  earliest_right_swipe: datetime.datetime
+
+  class Config:
+    orm_mode = True

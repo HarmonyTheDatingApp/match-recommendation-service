@@ -77,3 +77,16 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
                                        .limit(limit)
   
   return {'recommendation': [int(item[0]) for item in recommended_users.all()]}
+
+
+def post_right_swipes(db: Session, this_user: models.User, right_swipes: schemas.RightSwipedUsers):
+  instances = [models.RightSwipe(swiper=this_user.id, swipee=swipee)
+               for swipee in right_swipes.swipees if swipee != this_user.id]
+  db.bulk_save_objects(instances)
+  db.commit()
+  
+  total_rt_swipes = db.query(func.count(models.RightSwipe.id)).filter(models.RightSwipe.swiper == this_user.id).first()
+  earliest_rt_swipe = db.query(func.max(models.RightSwipe.created_on)) \
+                        .filter(models.RightSwipe.swiper == this_user.id).first()
+  
+  return schemas.RightSwipeStats(right_swipes=total_rt_swipes[0], earliest_right_swipe=earliest_rt_swipe[0])
