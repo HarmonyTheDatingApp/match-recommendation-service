@@ -38,3 +38,12 @@ class MusicTaste(Base):
   created_on = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
 
   users = relationship("User", back_populates="tastes")
+
+
+class RightSwipe(Base):
+  __tablename__ = 'rightswipes'
+  
+  id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+  swiper = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+  swipee = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+  created_on = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())

@@ -57,8 +57,12 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
   mean_embedding = np.average(embeddings, axis=0).tolist()
   mean_embedding = ','.join(map(str, mean_embedding))
   
+  right_swipes = db.query(models.RightSwipe).filter(models.RightSwipe.swiper == this_user.id).subquery()
+  
   recommended_users = db.query(models.MusicTaste.user_id)\
+                        .join(right_swipes, right_swipes.c.swipee == models.MusicTaste.user_id)\
                         .join(models.User, models.MusicTaste.user_id == models.User.id)\
+                        .filter(right_swipes.c.swipee == None)\
                         .filter(models.User.id != this_user.id)
   
   # preference filters
