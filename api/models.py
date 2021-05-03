@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
+import geoalchemy2 as ga
 
 from .database import Base
 from api.schemas import Gender, InterestedIn
@@ -11,10 +12,12 @@ class User(Base):
   id = sa.Column(sa.Integer, primary_key=True, index=True)
   gender = sa.Column(sa.Enum(Gender, name="gender_enum", create_type=False), nullable=False)
   dob = sa.Column(sa.Date(), nullable=False)
+  location = sa.Column(ga.Geography(geometry_type='POINT', srid=4326), nullable=False)
   pref_interested_in = sa.Column(sa.Enum(InterestedIn, name="pref_interested_in_enum",
                                          create_type=False), nullable=False)
   pref_age_min = sa.Column(sa.Integer, nullable=False, default=18)
   pref_age_max = sa.Column(sa.Integer, nullable=False, default=60)
+  pref_distance = sa.Column(sa.Integer, nullable=False, default=20)
   registered_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
   
   tracks = relationship("Track", back_populates="users", cascade="all, delete")

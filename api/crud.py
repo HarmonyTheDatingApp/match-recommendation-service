@@ -10,7 +10,8 @@ from core.Spotify import Spotify
 
 
 def get_user(db: Session, user_id: int) -> models.User:
-  return db.query(models.User).filter(models.User.id == user_id).first()
+  user = db.query(models.User).filter(models.User.id == user_id).first()
+  return user
 
 
 def get_tracks_for_user(db: Session, user_id: int):
@@ -18,14 +19,16 @@ def get_tracks_for_user(db: Session, user_id: int):
   return [track.track for track in tracks]
 
 
-def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> schemas.User:
+def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> models.User:
   new_user = models.User(
     id=user.id,
     gender=user.gender,
     dob=user.dob,
+    location=f'POINT({user.location.long} {user.location.lat})',
     pref_interested_in=user.pref_interested_in,
     pref_age_min=user.pref_age_min,
-    pref_age_max=user.pref_age_max
+    pref_age_max=user.pref_age_max,
+    pref_distance=user.pref_distance
   )
   db.add(new_user)
   db.commit()
@@ -49,6 +52,14 @@ def post_preferences(db: Session, this_user: models.User, preferences: schemas.P
   this_user.pref_interested_in = preferences.pref_interested_in
   this_user.pref_age_min = preferences.pref_age_min
   this_user.pref_age_max = preferences.pref_age_max
+  this_user.pref_distance = preferences.pref_distance
+  db.commit()
+  db.refresh(this_user)
+  return this_user
+
+
+def update_location(db: Session, this_user: models.User, location: schemas.Coordinates):
+  this_user.location = f"POINT({location.long} {location.lat})"
   db.commit()
   db.refresh(this_user)
   return this_user
