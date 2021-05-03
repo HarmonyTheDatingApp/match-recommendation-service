@@ -19,7 +19,14 @@ def get_tracks_for_user(db: Session, user_id: int):
 
 
 def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> schemas.User:
-  new_user = models.User(id=user.id, gender=user.gender, dob=user.dob, pref_interested_in=user.pref_interested_in)
+  new_user = models.User(
+    id=user.id,
+    gender=user.gender,
+    dob=user.dob,
+    pref_interested_in=user.pref_interested_in,
+    pref_age_min=user.pref_age_min,
+    pref_age_max=user.pref_age_max
+  )
   db.add(new_user)
   db.commit()
   db.refresh(new_user)
