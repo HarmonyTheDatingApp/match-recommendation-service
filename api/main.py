@@ -32,48 +32,48 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db_session))
   return utils.user_model_to_schema(new_user)
 
 @app.post("/users/{user_id}/preferences/", response_model=schemas.User)
-def update_preferences(user_id: int, preferences: schemas.Preferences, db: Session = Depends(get_db_session)):
+def update_preferences(user_id: str, preferences: schemas.Preferences, db: Session = Depends(get_db_session)):
   user = crud.get_user(db, user_id)
   if user is None:
     return HTTPException(status_code=400, detail="User not found.")
   return utils.user_model_to_schema(crud.post_preferences(db, user, preferences))
 
 @app.post("/users/{user_id}/location/", response_model=schemas.User)
-def update_location(user_id: int, location: schemas.Coordinates, db: Session = Depends(get_db_session)):
+def update_location(user_id: str, location: schemas.Coordinates, db: Session = Depends(get_db_session)):
   user = crud.get_user(db, user_id)
   if user is None:
     return HTTPException(status_code=400, detail="User not found.")
   return utils.user_model_to_schema(crud.update_location(db, user, location))
 
 @app.get("/users/{user_id}", response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db_session)):
+def get_user(user_id: str, db: Session = Depends(get_db_session)):
   user = crud.get_user(db, user_id=user_id)
   if user is None:
     raise HTTPException(status_code=404, detail="User not found.")
   return utils.user_model_to_schema(user)
 
 @app.post("/users/{user_id}/track/", response_model=schemas.Track)
-def add_track(track: schemas.Track, user_id: int, db: Session = Depends(get_db_session)):
+def add_track(track: schemas.Track, user_id: str, db: Session = Depends(get_db_session)):
   return crud.add_track(db, track=track, user_id=user_id)
 
 @app.get("/users/{user_id}/track/", response_model=List[str])
-def get_tracks(user_id: int, db: Session = Depends(get_db_session)):
+def get_tracks(user_id: str, db: Session = Depends(get_db_session)):
   tracks = crud.get_tracks_for_user(db, user_id=user_id)
   return tracks
 
 @app.get("/users/{user_id}/taste/", response_model=schemas.MusicTaste)
-def get_music_taste(user_id: int, db: Session = Depends(get_db_session)):
+def get_music_taste(user_id: str, db: Session = Depends(get_db_session)):
   return crud.get_music_taste(db, user_id)
 
 @app.get("/users/{user_id}/recommend/", response_model=schemas.RecommendedUsers)
-def get_recommendation(user_id: int, limit: Optional[int] = 10, db: Session = Depends(get_db_session)):
+def get_recommendation(user_id: str, limit: Optional[int] = 10, db: Session = Depends(get_db_session)):
   user = crud.get_user(user_id=user_id, db=db)
   if user is None:
     raise HTTPException(status_code=400, detail="User not found.")
   return crud.get_user_recommendation(db, user, limit)
 
 @app.post("/users/{user_id}/update-right-swipes/", response_model=schemas.RightSwipeStats)
-def post_right_swiped_users(user_id: int, right_swiped_users: schemas.RightSwipedUsers,
+def post_right_swiped_users(user_id: str, right_swiped_users: schemas.RightSwipedUsers,
                             db: Session = Depends(get_db_session)):
   user = crud.get_user(user_id=user_id, db=db)
   if user is None:

@@ -9,12 +9,12 @@ from core.FeatureExtractor import FeatureExtractor
 from core.Spotify import Spotify
 
 
-def get_user(db: Session, user_id: int) -> models.User:
+def get_user(db: Session, user_id: str) -> models.User:
   user = db.query(models.User).filter(models.User.id == user_id).first()
   return user
 
 
-def get_tracks_for_user(db: Session, user_id: int):
+def get_tracks_for_user(db: Session, user_id: str):
   tracks = db.query(models.Track.track).filter(models.Track.user_id == user_id).all()
   return [track.track for track in tracks]
 
@@ -65,7 +65,7 @@ def update_location(db: Session, this_user: models.User, location: schemas.Coord
   return this_user
 
 
-def add_track(db: Session, track: schemas.Track, user_id: int):
+def add_track(db: Session, track: schemas.Track, user_id: str):
   new_track = models.Track(track=track.track, user_id=user_id)
   db.add(new_track)
   db.commit()
@@ -73,7 +73,7 @@ def add_track(db: Session, track: schemas.Track, user_id: int):
   return new_track
 
 
-def get_music_taste(db: Session, user_id: int):
+def get_music_taste(db: Session, user_id: str):
   tastes = db.query(models.MusicTaste.vector).filter(models.MusicTaste.user_id == user_id).all()
   return {'taste': [row[0] for row in tastes]}
 

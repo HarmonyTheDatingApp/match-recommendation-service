@@ -9,7 +9,7 @@ from api.schemas import Gender, InterestedIn
 class User(Base):
   __tablename__ = "users"
   
-  id = sa.Column(sa.Integer, primary_key=True, index=True)
+  id = sa.Column(sa.String, primary_key=True, index=True)
   gender = sa.Column(sa.Enum(Gender, name="gender_enum", create_type=False), nullable=False)
   dob = sa.Column(sa.Date(), nullable=False)
   location = sa.Column(ga.Geography(geometry_type='POINT', srid=4326), nullable=False)
@@ -28,7 +28,7 @@ class Track(Base):
   __tablename__ = 'tracks'
   
   id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-  user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"))
+  user_id = sa.Column(sa.String, sa.ForeignKey("users.id", ondelete="CASCADE"))
   track = sa.Column(sa.String(length=40), nullable=False)
   
   users = relationship("User", back_populates="tracks")
@@ -38,7 +38,7 @@ class MusicTaste(Base):
   __tablename__ = 'musictaste'
   
   id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-  user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"))
+  user_id = sa.Column(sa.String, sa.ForeignKey("users.id", ondelete="CASCADE"))
   vector = sa.Column(sa.ARRAY(sa.Float), nullable=False)
   created_on = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
 
@@ -49,6 +49,14 @@ class RightSwipe(Base):
   __tablename__ = 'rightswipes'
   
   id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-  swiper = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-  swipee = sa.Column(sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+  swiper = sa.Column(
+    sa.String,
+    sa.ForeignKey("users.id", ondelete="CASCADE"),
+    nullable=False
+  )
+  swipee = sa.Column(
+    sa.String,
+    sa.ForeignKey("users.id", ondelete="CASCADE"),
+    nullable=False
+  )
   created_on = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
