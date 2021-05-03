@@ -97,9 +97,14 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
   preferred_gender = None if this_user.pref_interested_in == 'everyone' else this_user.pref_interested_in
   if preferred_gender:
     recommended_users = recommended_users.filter(models.User.gender == preferred_gender)
+  
   pref_age_min, pref_age_max = this_user.pref_age_min, this_user.pref_age_max
   recommended_users = recommended_users.filter(
     extract('year', func.age(models.User.dob)).between(pref_age_min, pref_age_max)
+  )
+  
+  recommended_users = recommended_users.filter(
+    func.ST_DWITHIN(models.User.location, this_user.location, this_user.pref_distance * 1000)
   )
   
   recommended_users = recommended_users.group_by(models.MusicTaste.user_id)\
