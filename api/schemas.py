@@ -65,7 +65,7 @@ class Coordinates(BaseModel):
 
 
 class User(Preferences):
-  id: int
+  id: str
   gender: Gender
   dob: datetime.date
   location: Coordinates
