@@ -1,16 +1,17 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, extract
 import numpy as np
 from typing import List
 from datetime import datetime
 
-from . import models, schemas
+from api import models, schemas
 from core.FeatureExtractor import FeatureExtractor
 from core.Spotify import Spotify
 
 
 def get_user(db: Session, user_id: int) -> models.User:
-  return db.query(models.User).filter(models.User.id == user_id).first()
+  user = db.query(models.User).filter(models.User.id == user_id).first()
+  return user
 
 
 def get_tracks_for_user(db: Session, user_id: int):
@@ -18,8 +19,17 @@ def get_tracks_for_user(db: Session, user_id: int):
   return [track.track for track in tracks]
 
 
-def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> schemas.User:
-  new_user = models.User(id=user.id, gender=user.gender, dob=user.dob, pref_interested_in=user.pref_interested_in)
+def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify) -> models.User:
+  new_user = models.User(
+    id=user.id,
+    gender=user.gender,
+    dob=user.dob,
+    location=f'POINT({user.location.long} {user.location.lat})',
+    pref_interested_in=user.pref_interested_in,
+    pref_age_min=user.pref_age_min,
+    pref_age_max=user.pref_age_max,
+    pref_distance=user.pref_distance
+  )
   db.add(new_user)
   db.commit()
   db.refresh(new_user)
@@ -36,6 +46,23 @@ def register_user(db: Session, user: schemas.UserCreate, spotify_client: Spotify
   
   db.commit()
   return new_user
+
+
+def post_preferences(db: Session, this_user: models.User, preferences: schemas.Preferences):
+  this_user.pref_interested_in = preferences.pref_interested_in
+  this_user.pref_age_min = preferences.pref_age_min
+  this_user.pref_age_max = preferences.pref_age_max
+  this_user.pref_distance = preferences.pref_distance
+  db.commit()
+  db.refresh(this_user)
+  return this_user
+
+
+def update_location(db: Session, this_user: models.User, location: schemas.Coordinates):
+  this_user.location = f"POINT({location.long} {location.lat})"
+  db.commit()
+  db.refresh(this_user)
+  return this_user
 
 
 def add_track(db: Session, track: schemas.Track, user_id: int):
@@ -70,6 +97,15 @@ def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10
   preferred_gender = None if this_user.pref_interested_in == 'everyone' else this_user.pref_interested_in
   if preferred_gender:
     recommended_users = recommended_users.filter(models.User.gender == preferred_gender)
+  
+  pref_age_min, pref_age_max = this_user.pref_age_min, this_user.pref_age_max
+  recommended_users = recommended_users.filter(
+    extract('year', func.age(models.User.dob)).between(pref_age_min, pref_age_max)
+  )
+  
+  recommended_users = recommended_users.filter(
+    func.ST_DWITHIN(models.User.location, this_user.location, this_user.pref_distance * 1000)
+  )
   
   recommended_users = recommended_users.group_by(models.MusicTaste.user_id)\
                                        .order_by(func.avg(func.cube(models.MusicTaste.vector)

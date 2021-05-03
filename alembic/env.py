@@ -8,7 +8,7 @@ from alembic import context
 import os
 
 from api.database import Base
-from api.models import User, Track
+from api.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
