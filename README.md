@@ -8,6 +8,7 @@ Requires Python-3.6+.
 * Upgrade PIP: `python -m pip install –upgrade pip`
 * Install all dependencies: `pip install -r requirements.txt`
 * Set `DATABASE_URL` environment variable to a Postgres database URL (local/cloud).
+* Set `SPOTIFY_CLIENT_ID` & `SPOTIFY_CLIENT_SECRET` environment variables with Spotify credentials.
 * Run migration scripts: `alembic upgrade head`
 * Start application: `uvicorn api.main:app --reload`
 * Generate migrations: `alembic revision --autogenerate -m <revision-msg>`
