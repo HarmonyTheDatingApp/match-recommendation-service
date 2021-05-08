@@ -93,14 +93,14 @@ class MusicTaste(BaseModel):
 
 
 class RecommendedUsers(BaseModel):
-  recommendation: List[int]
+  recommendation: List[str]
 
   class Config:
     orm_mode = True
 
 
 class RightSwipedUsers(BaseModel):
-  swipees: List[int]
+  swipees: List[str]
   
   class Config:
     orm_mode = True
