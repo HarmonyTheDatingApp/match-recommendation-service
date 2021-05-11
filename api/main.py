@@ -66,11 +66,22 @@ def get_music_taste(user_id: str, db: Session = Depends(get_db_session)):
   return crud.get_music_taste(db, user_id)
 
 @app.get("/users/{user_id}/recommend/", response_model=schemas.RecommendedUsers)
-def get_recommendation(user_id: str, limit: Optional[int] = 10, db: Session = Depends(get_db_session)):
+def get_recommendation(user_id: str, long: Optional[float] = None, lat: Optional[int] = None,
+                       limit: Optional[int] = 10, db: Session = Depends(get_db_session)):
+  """
+  If location given, then it updates the user location and then runs the recommendation algorithm.
+  """
+  if long is None and lat is None:
+    location = None
+  elif long and lat:
+    location = schemas.Coordinates(long=long, lat=lat)
+  else:
+    raise HTTPException(status_code=400, detail="Both longitude & latitude required.")
+
   user = crud.get_user(user_id=user_id, db=db)
   if user is None:
     raise HTTPException(status_code=400, detail="User not found.")
-  return crud.get_user_recommendation(db, user, limit)
+  return crud.get_user_recommendation(db, user, location, limit)
 
 @app.post("/users/{user_id}/update-right-swipes/", response_model=schemas.RightSwipeStats)
 def post_right_swiped_users(user_id: str, right_swiped_users: schemas.RightSwipedUsers,
