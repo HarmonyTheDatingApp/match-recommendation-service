@@ -78,7 +78,10 @@ def get_music_taste(db: Session, user_id: str):
   return {'taste': [row[0] for row in tastes]}
 
 
-def get_user_recommendation(db: Session, this_user: models.User, limit: int = 10):
+def get_user_recommendation(db: Session, this_user: models.User, location: schemas.Coordinates, limit: int = 10):
+  if location:
+    this_user = update_location(db, this_user, location)
+  
   # embeddings
   embeddings = np.array([embedding[0] for embedding in
                          db.query(models.MusicTaste.vector).filter(models.MusicTaste.user_id == this_user.id)])
