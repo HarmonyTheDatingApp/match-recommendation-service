@@ -77,6 +77,12 @@ class User(Preferences):
 class UserCreate(User):
   tracks: List[str]
 
+  @validator('tracks')
+  def tracks_length(cls, v):
+    if len(v) < 4:
+      raise ValueError("Length of tracks must be greater than equal to 4.")
+    return v
+
 
 class Track(BaseModel):
   track: str
