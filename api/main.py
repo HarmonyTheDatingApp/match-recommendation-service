@@ -66,7 +66,7 @@ def get_music_taste(user_id: str, db: Session = Depends(get_db_session)):
   return crud.get_music_taste(db, user_id)
 
 @app.get("/users/{user_id}/recommend/", response_model=schemas.RecommendedUsers)
-def get_recommendation(user_id: str, long: Optional[float] = None, lat: Optional[int] = None,
+def get_recommendation(user_id: str, long: Optional[float] = None, lat: Optional[float] = None,
                        limit: Optional[int] = 10, db: Session = Depends(get_db_session)):
   """
   If location given, then it updates the user location and then runs the recommendation algorithm.
