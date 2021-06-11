@@ -115,7 +115,7 @@ def get_user_recommendation(db: Session, this_user: models.User, location: schem
                                                               .op('<->')(func.cube(mean_embedding))))\
                                        .limit(limit)
   
-  return {'recommendation': [item[0] for item in recommended_users.all()]}
+  return {'recommendation': [int(item[0]) for item in recommended_users.all()]}
 
 
 def post_right_swipes(db: Session, this_user: models.User, right_swipes: schemas.RightSwipedUsers):
